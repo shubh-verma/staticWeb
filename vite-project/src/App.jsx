@@ -8,6 +8,19 @@ function App() {
   const [data, setData] = useState([]);
   const [input, setInput] = useState([]);
 
+  // const useDebounce = (value, delay) => {
+  //   const [debouncedValue, setDebouncedValue] = useState("");
+  //   useEffect(() => {
+  //     const timeout = setTimeout(() => {
+  //       setDebouncedValue(debouncedValue);
+  //       console.log(debouncedValue);
+  //     }, delay);
+
+  //     return () => clearTimeout(timeout);
+  //   }, [debouncedValue]);
+
+  //   return debouncedValue;
+  // };
   const saveSearch = async (value) => {
     let data = await apiCall(value);
     if (data && data.items) {
@@ -21,6 +34,7 @@ function App() {
   };
 
   async function apiCall(input) {
+    // const debouncedCall = useDebounce(input, 500);
     const baseURL = `https://api.github.com/search/users`;
     let queryURL = `${baseURL}?q=fullname:${input}&sort=followers`;
 
