@@ -1,53 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./index.css";
-import Table from "./Table.jsx";
+import Table from "./Table";
+
+import useDebounce from "./hooks/useDebounce";
 
 import axios from "axios";
 
 function App() {
   const [data, setData] = useState([]);
-  const [input, setInput] = useState([]);
+  const [input, setInput] = useState("");
 
-  // const useDebounce = (value, delay) => {
-  //   const [debouncedValue, setDebouncedValue] = useState("");
-  //   useEffect(() => {
-  //     const timeout = setTimeout(() => {
-  //       setDebouncedValue(debouncedValue);
-  //       console.log(debouncedValue);
-  //     }, delay);
+  const debouncedValue = useDebounce(input, 500);
 
-  //     return () => clearTimeout(timeout);
-  //   }, [debouncedValue]);
-
-  //   return debouncedValue;
-  // };
-  const saveSearch = async (value) => {
-    let data = await apiCall(value);
-    if (data && data.items) {
-      data = data?.items;
-      setData(data);
-    } else if (data && data.message) {
-      setErrorLog(true);
-    } else {
-      setData(data);
-    }
-  };
-
-  async function apiCall(input) {
-    // const debouncedCall = useDebounce(input, 500);
+  useEffect(() => {
+    console.log(debouncedValue);
     const baseURL = `https://api.github.com/search/users`;
     let queryURL = `${baseURL}?q=fullname:${input}&sort=followers`;
-
-    try {
-      const response = await axios.get(queryURL);
-      // console.log("response", response);
-      setData(response.data.items);
-      setErrorLog(false);
-    } catch (error) {
-      setData(error.response.data);
-      setErrorLog(true);
+    console.log(queryURL);
+    if (debouncedValue) {
+      axios
+        .get(queryURL)
+        .then((r) => {
+          console.log(r.data);
+          if (r.data && r.data.items) {
+            setData(data.items);
+          }
+        })
+        .catch((e) => console.error(e));
     }
-  }
+  }, [debouncedValue]);
 
   return (
     <>
@@ -59,7 +40,7 @@ function App() {
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
-            saveSearch(e.target.value);
+            // saveSearch(e.target.value);
           }}
         />
         <svg
